@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="th" data-theme="day">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Board · COMMOON SOCIETY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body data-theme="day">
+  <div class="stage" id="stage"></div>
+  <button class="sound-toggle pframe" id="soundBtn" type="button"></button>
+  <div class="modal hidden" id="waiting"><div class="pframe center-msg"><div class="pixel-title" style="font-size:.8rem">COMMOON SOCIETY</div><div class="big" id="waitMsg">รอครูเริ่มเกม…</div><div class="room-code" id="waitCode"></div><div class="muted" id="waitCount"></div></div></div>
+  <script src="./socket.io.js"></script>
+  <script src="./board.bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMMOON SOCIETY ทดลองเล่น</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* VOICE: playful school-night game, same pixel world as the real board
+   IDEA: a teacher's test bench — the projector and one phone side by side
+   PICTURE: the live game itself (board + phone), nothing drawn around it
+   COLOUR and TYPE: night navy #101C35, moon cream #FFF4C9, accent orange #FF9B35 · Press Start 2P titles, Mitr body
+   LAYOUT: setup card → bench (controls row, board left, phone right; tabs under 1000px) */
+:root{color-scheme:dark;--bg:#101C35;--panel:#1B2B4F;--line:#0A1226;--ink:#FFF4C9;--mute:#A9B6D6;--acc:#FF9B35;--blue:#38A9E8;--red:#EF5350}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(circle at 85% 8%,#2a3d6b 0,transparent 32%),var(--bg);color:var(--ink);font:16px/1.55 'Noto Sans Thai','Mitr',sans-serif;overflow-x:clip}
+h1{font:400 clamp(15px,2.6vw,22px)/1.5 'Press Start 2P',monospace;margin:0;letter-spacing:.02em}
+.px{background:var(--panel);border:4px solid var(--line);box-shadow:0 0 0 3px #2F4577,6px 6px 0 3px #050914}
+button,input{font:600 16px 'Mitr',sans-serif}
+.btn{min-height:44px;padding:8px 16px;border:3px solid var(--line);background:#2F4577;color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 #050914}
+.btn:hover{filter:brightness(1.15)}.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #050914}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.btn.go{background:var(--acc);color:#10192f}.btn.on{background:var(--blue);color:#10192f}.btn.bad{background:#7a2b3a}
+/* setup */
+#setup{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+.card{width:min(560px,100%);padding:clamp(20px,4vw,36px);display:grid;gap:18px}
+.moon{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF9DE,#F7DA7A 60%,#d9b14a);box-shadow:0 0 40px #f7da7a66;justify-self:end;margin-bottom:-60px}
+.lead{color:var(--mute);margin:0}
+label b{display:block;font-family:Mitr;margin-bottom:6px}
+input[type=text]{width:100%;min-height:44px;padding:8px 12px;border:3px solid var(--line);background:#0E1A33;color:var(--ink);font-size:16px}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.modes .btn{display:grid;gap:2px;text-align:center;padding:10px 6px}.modes small{font:400 13px 'Noto Sans Thai';opacity:.85}
+.range{display:flex;gap:12px;align-items:center}.range input{flex:1;accent-color:var(--acc)}
+.range output{font:400 14px 'Press Start 2P';min-width:3ch;text-align:right}
+.note{font-size:14px;color:var(--mute);margin:0}
+/* bench */
+#bench{display:none;height:100%;flex-direction:column;gap:10px;padding:10px}
+#bench.show{display:flex}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px}
+.bar .title{font:400 11px 'Press Start 2P';margin-inline-end:auto;color:var(--acc)}
+.bar .btn{min-height:40px;padding:6px 12px;font-size:15px}
+.views{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:12px;min-height:0}
+.pane{position:relative;overflow:hidden;min-height:0}
+#boardPane{background:#000}.rot{display:none;position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:13px;color:var(--mute);z-index:1}
+@media (max-width:600px) and (orientation:portrait){.rot{display:block}}
+#boardFrame{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform-origin:0 0}
+#phoneFrame{width:100%;height:100%;border:0;display:block;background:#dcecfa}
+.tabs{display:none;gap:8px}
+.tabs .btn{flex:1}
+.hint{font-size:13px;color:var(--mute);padding:0 4px}
+@media (max-width:1000px){
+  .views{grid-template-columns:minmax(0,1fr)}
+  .tabs{display:flex}
+  .views[data-show=phone] #boardPane,.views[data-show=board] #phonePane{display:none}
+  .bar .title{flex-basis:100%}
+}
+@media (max-width:600px){#bench{padding:6px;gap:6px}.bar{padding:6px;gap:6px}.bar .title{display:none}.bar .btn{min-height:38px;padding:4px 9px;font-size:13px;flex:1}.tabs .btn{min-height:38px}.hint{display:none}}
+@media (prefers-reduced-motion:no-preference){.moon{animation:glow 4s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 70px #f7da7a99}}}
+</style>
+</head>
+<body>
+<section id="setup">
+  <form class="card px" id="setupForm">
+    <div class="moon" aria-hidden="true"></div>
+    <h1>COMMOON<br>SOCIETY</h1>
+    <p class="lead">ห้องทดลองเล่น · คำสาปแสงจันทร์ที่โรงเรียนมูนสคูล</p>
+    <label><b>ชื่อตัวละครของคุณ</b><input type="text" id="nm" maxlength="16" value="ครูทดลอง" autocomplete="off"></label>
+    <div><b style="font-family:Mitr;display:block;margin-bottom:6px">โหมด</b>
+      <div class="modes" id="modes">
+        <button type="button" class="btn on" data-mode="short">สั้น<small>7 วัน</small></button>
+        <button type="button" class="btn" data-mode="medium">กลาง<small>15 วัน · มีทูต</small></button>
+        <button type="button" class="btn" data-mode="marathon">มาราธอน<small>ไม่จำกัดวัน</small></button>
+      </div></div>
+    <label><b>เพื่อนบอท</b><span class="range"><input type="range" id="bots" min="4" max="19" value="9"><output id="botsOut">9</output></span></label>
+    <p class="note">ผู้เล่นทั้งหมด <span id="total">10</span> คน · คุณเล่น 1 คน ที่เหลือเป็นบอท · เกมทั้งหมดทำงานในหน้านี้ ไม่ต้องติดตั้งและไม่ส่งข้อมูลออกไปไหน</p>
+    <button class="btn go" type="submit" style="min-height:52px;font-size:18px">เริ่มทดลองเล่น</button>
+  </form>
+</section>
+
+<section id="bench">
+  <div class="bar px">
+    <span class="title">ผู้ดูแลห้อง</span>
+    <button class="btn" id="pauseBtn" type="button">⏸ หยุด</button>
+    <button class="btn" id="nextBtn" type="button">⏭ ข้ามช่วง</button>
+    <button class="btn" id="addBtn" type="button">+30 วิ</button>
+    <button class="btn bad" id="endBtn" type="button">จบเกม</button>
+    <button class="btn" id="resetBtn" type="button">เริ่มใหม่</button>
+  </div>
+  <div class="tabs"><button class="btn" data-tab="board" type="button">จอกลาง</button><button class="btn on" data-tab="phone" type="button">มือถือของฉัน</button></div>
+  <div class="views" id="views" data-show="phone">
+    <div class="pane px" id="boardPane"><span class="rot">หมุนมือถือแนวนอนเพื่อดูจอกลางใหญ่ขึ้น</span><iframe id="boardFrame" title="จอกลาง"></iframe></div>
+    <div class="pane px" id="phonePane"><iframe id="phoneFrame" title="มือถือของคุณ"></iframe></div>
+  </div>
+  <div class="hint">เคล็ดลับ: 1 วันในเกม = 1 นาที กด "ข้ามช่วง" เพื่อไปช่วงถัดไปทันที · ค่าสถานะและคุณลักษณะลับอยู่ในแท็บ "การ์ด" บนมือถือ</div>
+</section>
+
+<script src="./engine.js"></script>
+<script>
+{
+  const $ = (s) => document.querySelector(s);
+  let mode = 'short';
+  $('#modes').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mode]'); if (!b) return;
+    mode = b.dataset.mode;
+    for (const x of document.querySelectorAll('[data-mode]')) x.classList.toggle('on', x === b);
+  });
+  const syncBots = () => { $('#botsOut').textContent = $('#bots').value; $('#total').textContent = Number($('#bots').value) + 1; };
+  $('#bots').addEventListener('input', syncBots);
+
+  const fit = () => {
+    const pane = $('#boardPane'), f = $('#boardFrame');
+    const k = Math.min(pane.clientWidth / 1280, pane.clientHeight / 720) || 0.3;
+    f.style.transform = `scale(${k})`;
+    f.style.left = `${(pane.clientWidth - 1280 * k) / 2}px`;
+    f.style.top = `${(pane.clientHeight - 720 * k) / 2}px`;
+  };
+  const ro = new ResizeObserver(fit); ro.observe($('#boardPane'));
+
+  $('#setupForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const s = DemoHub.start({ name: $('#nm').value.trim() || 'ครูทดลอง', mode, bots: Number($('#bots').value) });
+    $('#setup').style.display = 'none';
+    $('#bench').classList.add('show');
+    $('#boardFrame').src = `./board.html?room=${s.code}`;
+    $('#phoneFrame').src = `./play.html?room=${s.code}&pid=${encodeURIComponent(s.playerId)}&tok=${s.token}`;
+    requestAnimationFrame(fit);
+  });
+
+  for (const t of document.querySelectorAll('[data-tab]')) t.addEventListener('click', () => {
+    $('#views').dataset.show = t.dataset.tab;
+    for (const x of document.querySelectorAll('[data-tab]')) x.classList.toggle('on', x === t);
+    requestAnimationFrame(fit);
+  });
+
+  $('#pauseBtn').addEventListener('click', () => { const st = DemoHub.state(); if (st) DemoHub.host(st.paused ? 'resume' : 'pause'); syncBar(); });
+  $('#nextBtn').addEventListener('click', () => DemoHub.host('next'));
+  $('#addBtn').addEventListener('click', () => DemoHub.host('addTime', { seconds: 30 }));
+  $('#endBtn').addEventListener('click', () => DemoHub.host('endGame'));
+  $('#resetBtn').addEventListener('click', () => {
+    $('#boardFrame').src = 'about:blank'; $('#phoneFrame').src = 'about:blank';
+    $('#bench').classList.remove('show'); $('#setup').style.display = '';
+  });
+  const syncBar = () => {
+    const st = DemoHub.state(); if (!st) return;
+    $('#pauseBtn').textContent = st.paused ? '▶ เล่นต่อ' : '⏸ หยุด';
+    $('#pauseBtn').classList.toggle('on', st.paused);
+    for (const id of ['#pauseBtn', '#nextBtn', '#addBtn', '#endBtn']) $(id).disabled = st.finished;
+  };
+  setInterval(syncBar, 500);
+  syncBots();
+}
+</script>
+</body>
+</html>
